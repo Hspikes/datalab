@@ -160,8 +160,9 @@ NOTES:
  *   Rating: 1
  */
 int isZero(int x) {
-  return 2;
+   return !x;
 }
+
 /* 
  * bitXor - x^y using only ~ and & 
  *   Example: bitXor(4, 5) = 1
@@ -169,8 +170,9 @@ int isZero(int x) {
  *   Max ops: 14
  *   Rating: 1
  */
+
 int bitXor(int x, int y) {
-  return 2;
+   return ~((~((~x)&y))&(~(x&(~y))));
 }
 // Rating 2
 /* 
@@ -181,7 +183,7 @@ int bitXor(int x, int y) {
  *   Rating: 2
  */
 int copyLSB(int x) {
-  return 2;
+   return ((x&1)<<31)>>31;
 }
 /* 
  * isNegative(x) - return 1 if x < 0, return 0 otherwise 
@@ -191,7 +193,7 @@ int copyLSB(int x) {
  *   Rating: 2
  */
 int isNegative(int x) {
-  return 2;
+   return (x>>31)&1;
 }
 /* 
  * allEvenBits - return 1 if all even-numbered bits in word set to 1
@@ -202,7 +204,11 @@ int isNegative(int x) {
  *   Rating: 2
  */
 int allEvenBits(int x) {
-  return 2;
+   x=x&(x>>16);
+   x=x&(x>>8);
+   x=x&(x>>4);
+   x=x&(x>>2);
+   return x&1;
 }
 /* 
  * byteSwap - swaps the nth byte and the mth byte
@@ -214,7 +220,16 @@ int allEvenBits(int x) {
  *  Rating: 2
  */
 int byteSwap(int x, int n, int m) {
-    return 2;
+   int temp1,temp2;
+   n=n<<3;
+   m=m<<3;
+   temp1=(x>>n)&(0xFF);
+   temp2=(x>>m)&(0xFF);
+   x&=~(0xFF<<n);
+   x&=~(0xFF<<m);
+   x|=(temp1<<m);
+   x|=(temp2<<n);
+   return x;
 }
 /* 
  * removeRightmostOne(x) - remove the rightmost 1 from x
@@ -224,7 +239,7 @@ int byteSwap(int x, int n, int m) {
  *   Rating: 2
  */
 int removeRightmostOne(int x) {
-    return 2;
+    return x+(~(x&((~x)+1)))+1;
 }
 // Rating 3
 /*
@@ -238,7 +253,12 @@ int removeRightmostOne(int x) {
  */
 int maskBelowHighest(int x)
 {
-    return 2;
+   x|=(x>>1);
+   x|=(x>>2);
+   x|=(x>>4);
+   x|=(x>>8);
+   x|=(x>>16);
+   return x;
 }
 /*
  * largerAbsVal - return the number who has a larger Abs. if |a| == |b|, return the first.
@@ -249,7 +269,10 @@ int maskBelowHighest(int x)
  *   Rating: 3
  */
 int largerAbsVal(int a, int b) {
-  return 2;
+   int ta=((a>>31)&((~a)+1))|((~(a>>31))&a);
+   int tb=((b>>31)&b)|((~(b>>31))&((~b)+1));
+   int c=ta+tb>>31;
+   return ((~c)&a)|(c&b);
 }
 // Rating 4
 /*
@@ -261,5 +284,39 @@ int largerAbsVal(int a, int b) {
  *   Rating: 4
  */
 int bitReverse(int x) {
-    return 2;
+   int temp,mask;
+   mask=0x55;
+   mask|=(mask<<8);
+   mask|=(mask<<16);
+   temp=(x>>1)&mask;
+   temp|=(x<<1)&(mask<<1);
+   x=temp;
+   
+   mask=0x33;
+   mask|=(mask<<8);
+   mask|=(mask<<16);
+   temp=(x>>2)&mask;
+   temp|=(x<<2)&(mask<<2);
+   x=temp;
+
+   mask=0xF;
+   mask|=(mask<<8);
+   mask|=(mask<<16);
+   temp=(x>>4)&mask;
+   temp|=(x<<4)&(mask<<4);
+   x=temp;
+
+   mask=0xFF;
+   mask|=(mask<<16);
+   temp=(x>>8)&mask;
+   temp|=(x<<8)&(mask<<8);
+   x=temp;
+
+   mask=0xFF;
+   mask|=(mask<<8);
+   temp=mask&(x>>16);
+   temp|=(x<<16);
+   x=temp;
+
+   return x;
 }
